@@ -706,12 +706,10 @@ window.doXlsxExport=function(){
 
     for(const wid of weekIds){
       const records=byWeek[wid];
-      // 頁簽名稱：weekId 是週五日期，例如 2026-04-10 → 0410
+      // 頁簽名稱：weekId 是週五日期，直接用週五的 MMDD
       const d=new Date(wid);
-      // 轉成 MMDD 格式（週六，+1天）
-      const sheetDay=new Date(d.getTime()+86400000);
-      const mo=String(sheetDay.getMonth()+1).padStart(2,'0');
-      const dy=String(sheetDay.getDate()).padStart(2,'0');
+      const mo=String(d.getMonth()+1).padStart(2,'0');
+      const dy=String(d.getDate()).padStart(2,'0');
       const sheetName=mo+dy;
 
       // 依部門分組
@@ -729,21 +727,19 @@ window.doXlsxExport=function(){
 
       // 依部門順序輸出
       const deptOrder=['開發','營運','行銷','編輯','設計','商務','行政','數據','其他'];
+      let rowIdx=3;
       for(const dept of deptOrder){
         if(!byDept[dept])continue;
         rows.push([dept,null,null,null]);
+        rowIdx++;
         for(const r of byDept[dept]){
-          const thisW=r.thisWeekItems||[];
-          const nextW=r.nextWeekItems||[];
-          const maxRows=Math.max(thisW.length,nextW.length,1);
-          for(let i=0;i<maxRows;i++){
-            rows.push([
-              i===0?r.userName:null,
-              i+1,
-              thisW[i]||null,
-              nextW[i]||null
-            ]);
-          }
+          const thisW=(r.thisWeekItems||[]).filter(s=>s&&s.trim());
+          const nextW=(r.nextWeekItems||[]).filter(s=>s&&s.trim());
+          // 合併成一大格，用換行連接
+          const thisCell=thisW.join('\n')||null;
+          const nextCell=nextW.join('\n')||null;
+          rows.push([r.userName,1,thisCell,nextCell]);
+          rowIdx++;
         }
       }
 
@@ -800,12 +796,10 @@ window.doXlsxExport=function(){
 
     for(const wid of weekIds){
       const records=byWeek[wid];
-      // 頁簽名稱：weekId 是週五日期，例如 2026-04-10 → 0410
+      // 頁簽名稱：weekId 是週五日期，直接用週五的 MMDD
       const d=new Date(wid);
-      // 轉成 MMDD 格式（週六，+1天）
-      const sheetDay=new Date(d.getTime()+86400000);
-      const mo=String(sheetDay.getMonth()+1).padStart(2,'0');
-      const dy=String(sheetDay.getDate()).padStart(2,'0');
+      const mo=String(d.getMonth()+1).padStart(2,'0');
+      const dy=String(d.getDate()).padStart(2,'0');
       const sheetName=mo+dy;
 
       // 依部門分組
@@ -823,21 +817,19 @@ window.doXlsxExport=function(){
 
       // 依部門順序輸出
       const deptOrder=['開發','營運','行銷','編輯','設計','商務','行政','數據','其他'];
+      let rowIdx=3;
       for(const dept of deptOrder){
         if(!byDept[dept])continue;
         rows.push([dept,null,null,null]);
+        rowIdx++;
         for(const r of byDept[dept]){
-          const thisW=r.thisWeekItems||[];
-          const nextW=r.nextWeekItems||[];
-          const maxRows=Math.max(thisW.length,nextW.length,1);
-          for(let i=0;i<maxRows;i++){
-            rows.push([
-              i===0?r.userName:null,
-              i+1,
-              thisW[i]||null,
-              nextW[i]||null
-            ]);
-          }
+          const thisW=(r.thisWeekItems||[]).filter(s=>s&&s.trim());
+          const nextW=(r.nextWeekItems||[]).filter(s=>s&&s.trim());
+          // 合併成一大格，用換行連接
+          const thisCell=thisW.join('\n')||null;
+          const nextCell=nextW.join('\n')||null;
+          rows.push([r.userName,1,thisCell,nextCell]);
+          rowIdx++;
         }
       }
 
