@@ -206,12 +206,19 @@ function loadPersonReport(name,weekId){
     while(UI.nextItems.length<3)UI.nextItems.push('');
     UI.editing=true;
   } else {
+    const prevReport=D.reports[`${prevW(weekId)}_${name}`];
     if(prevPlan.length>0){
+      // 上週有寫且有填下週預定 → 自動帶入
       const filteredPlan=prevPlan.filter(i=>i.trim());
       UI.thisItems=[...filteredPlan];
       UI.thisPre=filteredPlan.map(()=>true);
       while(UI.thisItems.length<5){UI.thisItems.push('');UI.thisPre.push(false);}
+    } else if(prevReport){
+      // 上週有寫但沒填下週預定 → 空白，不顯示警示
+      UI.thisItems=['','','','',''];
+      UI.thisPre=Array(5).fill(false);
     } else {
+      // 上週真的沒寫週報 → 顯示警示
       UI.thisItems=['⚠️ 上週沒有寫週報哦，不要再忘記啦~','','','',''];
       UI.thisPre=Array(5).fill(false);
     }
