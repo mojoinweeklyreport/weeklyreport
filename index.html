@@ -706,11 +706,10 @@ window.doXlsxExport=function(){
 
     for(const wid of weekIds){
       const records=byWeek[wid];
-      // 頁簽名稱：weekId 是週五日期，直接用週五的 MMDD
-      const d=new Date(wid);
-      const mo=String(d.getMonth()+1).padStart(2,'0');
-      const dy=String(d.getDate()).padStart(2,'0');
-      const sheetName=mo+dy;
+      // 頁簽名稱：直接切字串避免 UTC 時區問題
+      // wid 格式是 'YYYY-MM-DD'
+      const parts=wid.split('-');
+      const sheetName=parts[1]+parts[2]; // MMDD
 
       // 依部門分組
       const byDept={};
@@ -720,39 +719,40 @@ window.doXlsxExport=function(){
         byDept[dept].push(r);
       }
 
+      // 只輸出：人員(A)、當週進度(B)、下週進度(C)，無標題列、無編號欄
       const rows=[];
-      // 標題列
-      rows.push([null,'填寫規定','1. 請每週五下午18:00前完成更新']);
-      rows.push(['人員','編號','當週進度','下週進度']);
-
-      // 依部門順序輸出
       const deptOrder=['開發','營運','行銷','編輯','設計','商務','行政','數據','其他'];
-      let rowIdx=3;
       for(const dept of deptOrder){
         if(!byDept[dept])continue;
-        rows.push([dept,null,null,null]);
-        rowIdx++;
+        rows.push([dept,null,null]); // 部門列
         for(const r of byDept[dept]){
           const thisW=(r.thisWeekItems||[]).filter(s=>s&&s.trim());
           const nextW=(r.nextWeekItems||[]).filter(s=>s&&s.trim());
-          // 合併成一大格，用換行連接
-          const thisCell=thisW.join('\n')||null;
-          const nextCell=nextW.join('\n')||null;
-          rows.push([r.userName,1,thisCell,nextCell]);
-          rowIdx++;
+          rows.push([r.userName, thisW.join('\n')||null, nextW.join('\n')||null]);
         }
       }
 
       const ws=XLSX.utils.aoa_to_sheet(rows);
-      // 設定欄寬
-      ws['!cols']=[{wch:12},{wch:6},{wch:60},{wch:60}];
+      // 欄寬：A=12, B=60, C=60
+      ws['!cols']=[{wch:12},{wch:60},{wch:60}];
+      // 所有格子文字置上
+      const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+      for(let R=range.s.r;R<=range.e.r;R++){
+        for(let C=range.s.c;C<=range.e.c;C++){
+          const addr=XLSX.utils.encode_cell({r:R,c:C});
+          if(!ws[addr])continue;
+          if(!ws[addr].s)ws[addr].s={};
+          ws[addr].s.alignment={vertical:'top',wrapText:true};
+        }
+      }
       XLSX.utils.book_append_sheet(wb,ws,sheetName);
     }
 
-    // 產生今日日期作為檔名
-    const now=new Date();
-    const fname='週報統整_'+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'.xlsx';
-    XLSX.writeFile(wb,fname);
+    // 產生今日日期作為檔名（同樣切字串避免時區）
+    const today=new Date();
+    const fm=String(today.getMonth()+1).padStart(2,'0');
+    const fd=String(today.getDate()).padStart(2,'0');
+    XLSX.writeFile(wb,'週報統整_'+fm+fd+'.xlsx');
     status.style.color='#166534';
     status.textContent='✅ 已下載 '+weekIds.length+' 週資料！';
   }catch(err){status.style.color='#991b1b';status.textContent='❌ 匯出失敗：'+err.message;}
@@ -796,11 +796,10 @@ window.doXlsxExport=function(){
 
     for(const wid of weekIds){
       const records=byWeek[wid];
-      // 頁簽名稱：weekId 是週五日期，直接用週五的 MMDD
-      const d=new Date(wid);
-      const mo=String(d.getMonth()+1).padStart(2,'0');
-      const dy=String(d.getDate()).padStart(2,'0');
-      const sheetName=mo+dy;
+      // 頁簽名稱：直接切字串避免 UTC 時區問題
+      // wid 格式是 'YYYY-MM-DD'
+      const parts=wid.split('-');
+      const sheetName=parts[1]+parts[2]; // MMDD
 
       // 依部門分組
       const byDept={};
@@ -810,39 +809,40 @@ window.doXlsxExport=function(){
         byDept[dept].push(r);
       }
 
+      // 只輸出：人員(A)、當週進度(B)、下週進度(C)，無標題列、無編號欄
       const rows=[];
-      // 標題列
-      rows.push([null,'填寫規定','1. 請每週五下午18:00前完成更新']);
-      rows.push(['人員','編號','當週進度','下週進度']);
-
-      // 依部門順序輸出
       const deptOrder=['開發','營運','行銷','編輯','設計','商務','行政','數據','其他'];
-      let rowIdx=3;
       for(const dept of deptOrder){
         if(!byDept[dept])continue;
-        rows.push([dept,null,null,null]);
-        rowIdx++;
+        rows.push([dept,null,null]); // 部門列
         for(const r of byDept[dept]){
           const thisW=(r.thisWeekItems||[]).filter(s=>s&&s.trim());
           const nextW=(r.nextWeekItems||[]).filter(s=>s&&s.trim());
-          // 合併成一大格，用換行連接
-          const thisCell=thisW.join('\n')||null;
-          const nextCell=nextW.join('\n')||null;
-          rows.push([r.userName,1,thisCell,nextCell]);
-          rowIdx++;
+          rows.push([r.userName, thisW.join('\n')||null, nextW.join('\n')||null]);
         }
       }
 
       const ws=XLSX.utils.aoa_to_sheet(rows);
-      // 設定欄寬
-      ws['!cols']=[{wch:12},{wch:6},{wch:60},{wch:60}];
+      // 欄寬：A=12, B=60, C=60
+      ws['!cols']=[{wch:12},{wch:60},{wch:60}];
+      // 所有格子文字置上
+      const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+      for(let R=range.s.r;R<=range.e.r;R++){
+        for(let C=range.s.c;C<=range.e.c;C++){
+          const addr=XLSX.utils.encode_cell({r:R,c:C});
+          if(!ws[addr])continue;
+          if(!ws[addr].s)ws[addr].s={};
+          ws[addr].s.alignment={vertical:'top',wrapText:true};
+        }
+      }
       XLSX.utils.book_append_sheet(wb,ws,sheetName);
     }
 
-    // 產生今日日期作為檔名
-    const now=new Date();
-    const fname='週報統整_'+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'.xlsx';
-    XLSX.writeFile(wb,fname);
+    // 產生今日日期作為檔名（同樣切字串避免時區）
+    const today=new Date();
+    const fm=String(today.getMonth()+1).padStart(2,'0');
+    const fd=String(today.getDate()).padStart(2,'0');
+    XLSX.writeFile(wb,'週報統整_'+fm+fd+'.xlsx');
     status.style.color='#166534';
     status.textContent='✅ 已下載 '+weekIds.length+' 週資料！';
   }catch(err){status.style.color='#991b1b';status.textContent='❌ 匯出失敗：'+err.message;}
