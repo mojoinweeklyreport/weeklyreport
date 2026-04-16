@@ -427,6 +427,12 @@ ${UI.name?`
   <div id="importStatus" style="font-size:13px;margin-top:8px"></div>
 </div>
 <div class="card" style="border-color:#bfdbfe">
+  <div class="card-title" style="color:#1d4ed8">匯出週報 Excel</div>
+  <div style="font-size:13px;color:#6b7280;margin-bottom:10px">將系統內所有週報資料匯出成 .xlsx，格式與原始 Excel 相同（每週一個頁簽）。</div>
+  <button class="btn btn-sm" style="color:#1d4ed8;border-color:#bfdbfe" onclick="doXlsxExport()">下載 Excel</button>
+  <div id="exportStatus" style="font-size:13px;margin-top:8px"></div>
+</div>
+<div class="card" style="border-color:#bfdbfe">
   <div class="card-title" style="color:#1d4ed8">管理員密碼</div>
   <div class="row"><input type="password" id="newPass" placeholder="輸入新密碼"><button class="btn btn-sm" style="color:#1d4ed8;border-color:#bfdbfe;white-space:nowrap" onclick="changePass()">更新密碼</button></div>
 </div>
@@ -681,6 +687,81 @@ window.doXlsxImport=function(){
   reader.readAsArrayBuffer(file);
 };
 
+window.doXlsxExport=function(){
+  const status=document.getElementById('exportStatus');
+  status.style.color='#6b7280';status.textContent='產生中...';
+  try{
+    const allR=Object.assign({},HISTORY_REPORTS,D.reports);
+    // 依 weekId 分組
+    const byWeek={};
+    for(const[k,r] of Object.entries(allR)){
+      const wid=r.weekId||k.split('_')[0];
+      if(!byWeek[wid])byWeek[wid]=[];
+      byWeek[wid].push(r);
+    }
+    const weekIds=Object.keys(byWeek).sort();
+    if(!weekIds.length){status.style.color='#991b1b';status.textContent='❌ 沒有資料可匯出';return;}
+
+    const wb=XLSX.utils.book_new();
+
+    for(const wid of weekIds){
+      const records=byWeek[wid];
+      // 頁簽名稱：weekId 是週五日期，例如 2026-04-10 → 0410
+      const d=new Date(wid);
+      // 轉成 MMDD 格式（週六，+1天）
+      const sheetDay=new Date(d.getTime()+86400000);
+      const mo=String(sheetDay.getMonth()+1).padStart(2,'0');
+      const dy=String(sheetDay.getDate()).padStart(2,'0');
+      const sheetName=mo+dy;
+
+      // 依部門分組
+      const byDept={};
+      for(const r of records){
+        const dept=r.department||'其他';
+        if(!byDept[dept])byDept[dept]=[];
+        byDept[dept].push(r);
+      }
+
+      const rows=[];
+      // 標題列
+      rows.push([null,'填寫規定','1. 請每週五下午18:00前完成更新']);
+      rows.push(['人員','編號','當週進度','下週進度']);
+
+      // 依部門順序輸出
+      const deptOrder=['開發','營運','行銷','編輯','設計','商務','行政','數據','其他'];
+      for(const dept of deptOrder){
+        if(!byDept[dept])continue;
+        rows.push([dept,null,null,null]);
+        for(const r of byDept[dept]){
+          const thisW=r.thisWeekItems||[];
+          const nextW=r.nextWeekItems||[];
+          const maxRows=Math.max(thisW.length,nextW.length,1);
+          for(let i=0;i<maxRows;i++){
+            rows.push([
+              i===0?r.userName:null,
+              i+1,
+              thisW[i]||null,
+              nextW[i]||null
+            ]);
+          }
+        }
+      }
+
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      // 設定欄寬
+      ws['!cols']=[{wch:12},{wch:6},{wch:60},{wch:60}];
+      XLSX.utils.book_append_sheet(wb,ws,sheetName);
+    }
+
+    // 產生今日日期作為檔名
+    const now=new Date();
+    const fname='週報統整_'+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'.xlsx';
+    XLSX.writeFile(wb,fname);
+    status.style.color='#166534';
+    status.textContent='✅ 已下載 '+weekIds.length+' 週資料！';
+  }catch(err){status.style.color='#991b1b';status.textContent='❌ 匯出失敗：'+err.message;}
+};
+
 (function(){
   var modalShown=false;
   function checkDeadline(){
@@ -699,6 +780,81 @@ window.doXlsxImport=function(){
   }
   setInterval(checkDeadline,60000);
 })();
+
+window.doXlsxExport=function(){
+  const status=document.getElementById('exportStatus');
+  status.style.color='#6b7280';status.textContent='產生中...';
+  try{
+    const allR=Object.assign({},HISTORY_REPORTS,D.reports);
+    // 依 weekId 分組
+    const byWeek={};
+    for(const[k,r] of Object.entries(allR)){
+      const wid=r.weekId||k.split('_')[0];
+      if(!byWeek[wid])byWeek[wid]=[];
+      byWeek[wid].push(r);
+    }
+    const weekIds=Object.keys(byWeek).sort();
+    if(!weekIds.length){status.style.color='#991b1b';status.textContent='❌ 沒有資料可匯出';return;}
+
+    const wb=XLSX.utils.book_new();
+
+    for(const wid of weekIds){
+      const records=byWeek[wid];
+      // 頁簽名稱：weekId 是週五日期，例如 2026-04-10 → 0410
+      const d=new Date(wid);
+      // 轉成 MMDD 格式（週六，+1天）
+      const sheetDay=new Date(d.getTime()+86400000);
+      const mo=String(sheetDay.getMonth()+1).padStart(2,'0');
+      const dy=String(sheetDay.getDate()).padStart(2,'0');
+      const sheetName=mo+dy;
+
+      // 依部門分組
+      const byDept={};
+      for(const r of records){
+        const dept=r.department||'其他';
+        if(!byDept[dept])byDept[dept]=[];
+        byDept[dept].push(r);
+      }
+
+      const rows=[];
+      // 標題列
+      rows.push([null,'填寫規定','1. 請每週五下午18:00前完成更新']);
+      rows.push(['人員','編號','當週進度','下週進度']);
+
+      // 依部門順序輸出
+      const deptOrder=['開發','營運','行銷','編輯','設計','商務','行政','數據','其他'];
+      for(const dept of deptOrder){
+        if(!byDept[dept])continue;
+        rows.push([dept,null,null,null]);
+        for(const r of byDept[dept]){
+          const thisW=r.thisWeekItems||[];
+          const nextW=r.nextWeekItems||[];
+          const maxRows=Math.max(thisW.length,nextW.length,1);
+          for(let i=0;i<maxRows;i++){
+            rows.push([
+              i===0?r.userName:null,
+              i+1,
+              thisW[i]||null,
+              nextW[i]||null
+            ]);
+          }
+        }
+      }
+
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      // 設定欄寬
+      ws['!cols']=[{wch:12},{wch:6},{wch:60},{wch:60}];
+      XLSX.utils.book_append_sheet(wb,ws,sheetName);
+    }
+
+    // 產生今日日期作為檔名
+    const now=new Date();
+    const fname='週報統整_'+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'.xlsx';
+    XLSX.writeFile(wb,fname);
+    status.style.color='#166534';
+    status.textContent='✅ 已下載 '+weekIds.length+' 週資料！';
+  }catch(err){status.style.color='#991b1b';status.textContent='❌ 匯出失敗：'+err.message;}
+};
 
 (function(){
   var modalShown=false;
