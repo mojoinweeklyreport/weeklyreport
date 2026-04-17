@@ -686,8 +686,10 @@ window.doXlsxImport=function(){
         if(sheetChanged>0)totalSheets++;
       }
       try{localStorage.setItem('wr_reports',JSON.stringify(D.reports));}catch(e){}
+      // 同步到 Firebase
+      saveToFB('wr_reports',D.reports);
       status.style.color='#166534';
-      status.textContent=`✅ 完成！新增 ${totalAdded} 筆、覆蓋更新 ${totalUpdated} 筆（共 ${totalSheets} 週）。`;
+      status.textContent=`✅ 完成！新增 ${totalAdded} 筆、覆蓋更新 ${totalUpdated} 筆（共 ${totalSheets} 週）。已同步到雲端。`;
       input.value='';render();
     }catch(err){status.style.color='#991b1b';status.textContent='❌ 解析失敗：'+err.message;}
   };
