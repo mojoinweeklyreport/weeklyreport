@@ -571,6 +571,10 @@ window.clearAllData=()=>{
     D.config.departments=[];D.config.adminPassword='0000';
     Object.keys(D.reports).forEach(k=>delete D.reports[k]);
     Object.keys(D.leaves).forEach(k=>delete D.leaves[k]);
+    // 同步清除 Firebase
+    saveToFB('wr_config',{departments:[],adminPassword:'0000'});
+    saveToFB('wr_reports',{});
+    saveToFB('wr_leaves',{});
     UI.adminAuth=false;UI.dept='';UI.name='';UI.view='report';
     toast('已清除所有資料');render();
   };
