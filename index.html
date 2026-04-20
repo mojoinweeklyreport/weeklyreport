@@ -186,7 +186,7 @@ function doSave(){
 }
 function saveConfig(){save('wr_config',D.config);toast('設定已儲存');}
 function insertTestData(){
-  const ms=members();if(!ms.length){toast('請先新增部門與成員','err');return;}
+  const ms=members();if(!ms.length){toast('請先新增組別與成員','err');return;}
   const pw=prevW(UI.currentWeek);
   ms.forEach(m=>{D.reports[`${pw}_${m.name}`]={weekId:pw,userName:m.name,department:m.dept,thisWeekItems:['完成系統架構設計','進行前端元件開發','修正 Bug #231'],nextWeekItems:['撰寫單元測試','進行 Code Review','更新技術文件'],updatedAt:new Date().toLocaleString()};});
   save('wr_reports',D.reports);toast(`已插入上週假資料（${pw}）`,'info');render();
@@ -335,16 +335,16 @@ function build(){
 
   let reportHtml='';
   if(status!=='open'){
-    reportHtml=`<div class="card"><div style="font-size:12px;color:#6b7280;font-weight:500">週報日期</div><div style="font-size:16px;font-weight:700;color:#111827">${monday} ～ ${UI.currentWeek}${badge}</div></div><div class="locked-box"><div style="font-size:28px;margin-bottom:12px">🔒</div><div style="font-size:15px;font-weight:500;margin-bottom:6px">本週已截止</div><div style="font-size:13px;color:#6b7280">填寫期間為每週一 00:00 ～ 週五 23:59</div></div>`;
+    reportHtml=`<div class="card" style="padding:10px 20px"><div style="font-size:12px;color:#6b7280;font-weight:500">週報日期</div><div style="font-size:16px;font-weight:700;color:#111827">${monday} ～ ${UI.currentWeek}${badge}</div></div><div class="locked-box"><div style="font-size:28px;margin-bottom:12px">🔒</div><div style="font-size:15px;font-weight:500;margin-bottom:6px">本週已截止</div><div style="font-size:13px;color:#6b7280">填寫期間為每週一 00:00 ～ 週五 23:59</div></div>`;
   } else {
     reportHtml=`
 
 <div class="card">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-    <div><div style="font-size:12px;color:#6b7280;font-weight:500">週報日期</div><div style="font-size:16px;font-weight:700;color:#111827">${monday} ～ ${UI.currentWeek}${badge}</div></div><div style="background:#fff0f0;border:1px solid #fca5a5;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:15px;color:#dc2626;font-weight:500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" style="vertical-align:-1px;margin-right:6px;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>填寫完畢請務必按最底下的「<span style="font-size:17px;font-weight:700">提交週報</span>」按鈕！<br><span style="display:block;margin-top:10px;font-size:15px;font-weight:500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" style="vertical-align:-1px;margin-right:6px;flex-shrink:0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>提交後需要修改可以再按「更新內容」按鈕</span></div>
+    <div style="padding:10px 20px;background:#fff;border:0.5px solid #e5e7eb;border-radius:12px;margin-bottom:14px"><div style="font-size:12px;color:#6b7280;font-weight:500">週報日期</div><div style="font-size:16px;font-weight:700;color:#111827">${monday} ～ ${UI.currentWeek}${badge}</div></div><div style="background:#fff0f0;border:1px solid #fca5a5;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:15px;color:#dc2626;font-weight:500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" style="vertical-align:-2px;margin-right:6px;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>填寫完畢請務必按最底下的「<span style="font-size:17px;font-weight:700">提交週報</span>」按鈕<br><span style="display:block;margin-top:10px;font-size:15px;font-weight:500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" style="vertical-align:-2px;margin-right:6px;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>提交後需要修改可以再按「更新內容」按鈕</span><span style="display:block;margin-top:10px;font-size:15px;font-weight:500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" style="vertical-align:-2px;margin-right:6px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>每週五 23:59 後將關閉填寫，未填寫即缺交</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <select style="width:auto" onchange="UI.dept=this.value;UI.name='';UI.thisItems=['','','','',''];UI.thisPre=Array(5).fill(false);UI.nextItems=['','',''];UI.editing=false;render()">
-        <option value="">選擇部門</option>${D.config.departments.map(d=>`<option value="${d.name}"${UI.dept===d.name?' selected':''}>${d.name}</option>`).join('')}
+        <option value="">選擇組別</option>${D.config.departments.map(d=>`<option value="${d.name}"${UI.dept===d.name?' selected':''}>${d.name}</option>`).join('')}
       </select>
       <select style="width:auto" onchange="UI.name=this.value;if(this.value)loadPersonReport(this.value,UI.currentWeek);render()">
         <option value="">選擇姓名</option>${deptUsers.map(u=>`<option value="${u}"${UI.name===u?' selected':''}>${u}</option>`).join('')}
@@ -363,7 +363,7 @@ ${UI.name?`
 </div>
 <div class="card"><div class="card-title" style="color:#111827">下週預定工作</div>${ilines(UI.nextItems,null,'next')}<button class="btn btn-sm" style="margin-top:8px" onclick="UI.nextItems.push('');render()">+ 增加項目</button></div>
 <button class="btn ${UI.editing?'btn-primary':''}" style="width:100%;padding:12px;font-size:17px;font-weight:700;${UI.editing?'':`background:#dc2626;border-color:#dc2626;color:#fff`}" onclick="doSave()">${UI.editing?'更新內容':'提交週報'}</button>`
-:'<div style="text-align:center;padding:40px;color:#6b7280;font-size:14px">請選擇部門與姓名開始填寫</div>'}`;
+:'<div style="text-align:center;padding:40px;color:#6b7280;font-size:14px">請選擇組別與姓名開始填寫</div>'}`;
   }
 
   let adminHtml='';
@@ -392,7 +392,7 @@ ${UI.name?`
 
   let settingsHtml='';
   if(!UI.adminAuth){
-    settingsHtml=`<div style="max-width:320px;margin:40px auto"><div class="card" style="text-align:center"><div style="display:inline-flex;align-items:center;justify-content:center;background:#111827;border-radius:12px;width:48px;height:48px;margin-bottom:12px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e6c800" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div style="font-size:16px;font-weight:500;margin-bottom:4px">管理員驗證</div><div style="font-size:13px;color:#6b7280;margin-bottom:16px">請輸入密碼以進入後台</div><input type="password" id="passInput" placeholder="密碼（預設 0000）" style="text-align:center;font-size:16px;letter-spacing:4px;margin-bottom:10px" onkeydown="if(event.key==='Enter')doAdminAuth()"><button class="btn btn-primary" style="width:100%;padding:10px" onclick="doAdminAuth()">登入後台</button></div></div>`;
+    settingsHtml=`<div style="max-width:320px;margin:40px auto"><div class="card" style="text-align:center"><div style="display:inline-flex;align-items:center;justify-content:center;background:#111827;border-radius:12px;width:48px;height:48px;margin-bottom:12px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e6c800" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div style="font-size:16px;font-weight:500;margin-bottom:4px">管理員驗證</div><div style="margin-bottom:16px"></div><input type="password" id="passInput" placeholder="輸入密碼" style="text-align:center;font-size:16px;letter-spacing:4px;margin-bottom:10px" onkeydown="if(event.key==='Enter')doAdminAuth()"><button class="btn btn-primary" style="width:100%;padding:10px" onclick="doAdminAuth()">登入後台</button></div></div>`;
   } else {
     settingsHtml=`
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
@@ -400,15 +400,15 @@ ${UI.name?`
   <button class="btn btn-sm" onclick="UI.adminAuth=false;render()">🔒 登出</button>
 </div>
 <div class="card">
-  <div class="card-title">部門與成員管理</div>
+  <div class="card-title">組別與成員管理</div>
   <div class="row" style="margin-bottom:14px">
-    <input type="text" id="newDept" placeholder="新部門名稱"
+    <input type="text" id="newDept" placeholder="新組別名稱"
       oninput="UI._newDept=this.value"
       onkeydown="if(event.key==='Enter')addDept()" style="flex:1">
-    <button class="btn btn-sm" onclick="addDept()" style="color:#1d4ed8;border-color:#bfdbfe;white-space:nowrap;flex-shrink:0">新增部門</button>
+    <button class="btn btn-sm" onclick="addDept()" style="color:#1d4ed8;border-color:#bfdbfe;white-space:nowrap;flex-shrink:0">新增組別</button>
   </div>
   ${D.config.departments.map((dept,di)=>`<div style="border:0.5px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:10px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:700;color:#e6c800;font-size:13px;background:#111827;padding:3px 10px;border-radius:20px">${dept.name}</span><button class="btn btn-sm" style="color:#dc2626;border-color:#fca5a5;font-size:11px" onclick="delDept(${di})">刪除部門</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:700;color:#e6c800;font-size:13px;background:#111827;padding:3px 10px;border-radius:20px">${dept.name}</span><button class="btn btn-sm" style="color:#dc2626;border-color:#fca5a5;font-size:11px" onclick="delDept(${di})">刪除組別</button></div>
     <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:10px;align-items:center">
       <input type="text" id="newU_${di}" placeholder="姓名"
         oninput="UI._newU[${di}]=this.value"
@@ -441,11 +441,11 @@ ${UI.name?`
 </div>
 <div class="card" style="border-color:#bfdbfe">
   <div class="card-title" style="color:#1d4ed8">管理員密碼</div>
-  <div class="row"><input type="password" id="newPass" placeholder="輸入新密碼"><button class="btn btn-sm" style="color:#1d4ed8;border-color:#bfdbfe;white-space:nowrap" onclick="changePass()">更新密碼</button></div>
+  <div class="row"><input type="text" id="newPass" placeholder="輸入新密碼"><button class="btn btn-sm" style="color:#1d4ed8;border-color:#bfdbfe;white-space:nowrap" onclick="changePass()">更新密碼</button></div>
 </div>
 <div class="card" style="border-color:#fca5a5">
   <div class="card-title" style="color:#dc2626">危險操作</div>
-  <div style="font-size:13px;color:#6b7280;margin-bottom:10px">清除所有資料（部門、成員、週報、休假記錄），回到全新狀態。此操作無法還原。</div>
+  <div style="font-size:13px;color:#6b7280;margin-bottom:10px">清除所有資料（組別、成員、週報、休假記錄），回到全新狀態。此操作無法還原。</div>
   <button class="btn btn-sm" style="color:#dc2626;border-color:#fca5a5" onclick="clearAllData()">清除所有資料</button>
 </div>`;
   }
@@ -512,14 +512,39 @@ var members=D.config.departments.flatMap(function(d){return (d.users||[]).map(fu
 var opts=members.map(function(m){return '<option value="'+m.name+'"'+(UI.personName===m.name?' selected':'')+'>'+m.dept+' - '+m.name+'</option>';}).join('');
 var content='';
 if(UI.personName){
-  var keys=Object.keys(allR).filter(function(k){return k.endsWith('_'+UI.personName);}).sort().reverse();
-  if(keys.length===0){content='<div style="font-size:13px;color:#6b7280;text-align:center;padding:40px 0">尚無週報資料</div>';}
-  else{content=keys.map(function(k){
-    var r=allR[k];
-    var dd=new Date(r.weekId||k.split('_')[0]);dd.setDate(dd.getDate()-4);
-    var monday=dd.toISOString().slice(0,10);
-    var thisW=(r.thisWeekItems||[]).map(function(i){return '<div style="font-size:14px;margin-bottom:5px;white-space:pre-wrap">• '+i+'</div>';}).join('');
-    return '<div class="card" style="margin-bottom:12px"><div style="font-size:11px;color:#9ca3af;margin-bottom:8px">'+monday+' ～ '+(r.weekId||'')+'</div>'+thisW+'</div>';
+  // 找這個人的起算日期
+  var personMeta=D.config.departments.flatMap(function(d){return (d.users||[]).map(function(u){return {name:typeof u==='string'?u:u.name,joinDate:typeof u==='string'?'':u.joinDate||''};});}).find(function(u){return u.name===UI.personName;});
+  // 從起算日（或最早有資料的日期）算出所有週五到今天
+  var startDate=personMeta&&personMeta.joinDate?personMeta.joinDate:'2026-01-02';
+  // 找 startDate 當週或之後第一個週五
+  var sd=new Date(startDate+'T00:00:00');
+  while(sd.getDay()!==5){sd.setDate(sd.getDate()+1);}
+  var today=new Date();today.setHours(0,0,0,0);
+  var allWids=[];
+  var cur=new Date(sd);
+  while(cur<=today){
+    var y=cur.getFullYear();
+    var mo=String(cur.getMonth()+1).padStart(2,'0');
+    var dy=String(cur.getDate()).padStart(2,'0');
+    allWids.push(y+'-'+mo+'-'+dy);
+    cur.setDate(cur.getDate()+7);
+  }
+  allWids.reverse();
+  if(allWids.length===0){content='<div style="font-size:13px;color:#6b7280;text-align:center;padding:40px 0">尚無週報資料</div>';}
+  else{content=allWids.map(function(wid){
+    var r=allR[wid+'_'+UI.personName];
+    var isLeave=!!D.leaves[wid+'_'+UI.personName];
+    var dd=new Date(wid+'T00:00:00');dd.setDate(dd.getDate()-4);
+    var monday=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    var dateStr='<div style="font-size:13px;font-weight:500;color:#374151;margin-bottom:8px">'+monday+' ～ '+wid+'</div>';
+    if(isLeave){
+      return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#2563eb;font-weight:500">當週休假免交</div></div>';
+    }else if(!r){
+      return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#dc2626;font-weight:500">當週未交週報</div></div>';
+    }else{
+      var thisW=(r.thisWeekItems||[]).map(function(i){return '<div style="font-size:14px;margin-bottom:5px;white-space:pre-wrap">• '+i+'</div>';}).join('');
+      return '<div class="card" style="margin-bottom:12px">'+dateStr+thisW+'</div>';
+    }
   }).join('');}
 }else{content='<div style="font-size:13px;color:#6b7280;text-align:center;padding:40px 0">請先選擇成員</div>';}
 return '<div style="margin-bottom:14px"><div style="font-size:13px;color:#6b7280;margin-bottom:6px;font-weight:500">選擇成員</div><select onchange="UI.personName=this.value;render()" style="width:100%;padding:8px 12px;border:0.5px solid #e5e7eb;border-radius:8px;font-size:14px"><option value="">-- 請選擇 --</option>'+opts+'</select></div>'+content;
@@ -546,7 +571,23 @@ window.doSave=doSave;
 window.loadPersonReport=loadPersonReport;
 window.delItem=(type,i)=>{if(type==='this'){UI.thisItems.splice(i,1);UI.thisPre.splice(i,1);}else UI.nextItems.splice(i,1);render();};
 window.doAdminAuth=()=>{const v=document.getElementById('passInput')?.value||'';if(v===(D.config.adminPassword||'0000')){UI.adminAuth=true;toast('驗證成功');}else toast('密碼錯誤','err');};
-window.changePass=()=>{const v=document.getElementById('newPass')?.value;if(!v){toast('請輸入新密碼','err');return;}D.config.adminPassword=v;saveConfig();render();};
+window.changePass=()=>{
+  const v=document.getElementById('newPass')?.value;
+  if(!v){toast('請輸入新密碼','err');return;}
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML='<div style="background:#fff;border-radius:12px;padding:24px;max-width:300px;width:90%;text-align:center"><div style="font-size:15px;font-weight:500;margin-bottom:8px">確認更新密碼？</div><div style="font-size:13px;color:#6b7280;margin-bottom:6px">新密碼為</div><div style="font-size:18px;font-weight:700;color:#111827;letter-spacing:2px;margin-bottom:20px">'+v+'</div><div style="display:flex;gap:8px;justify-content:center"><button id="cancelPass" style="padding:8px 20px;border:0.5px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:13px;background:#fff">取消</button><button id="confirmPass" style="padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-size:13px;background:#1d4ed8;color:#fff">確認更新</button></div></div>';
+  document.body.appendChild(overlay);
+  document.getElementById('cancelPass').onclick=()=>overlay.remove();
+  document.getElementById('confirmPass').onclick=()=>{
+    overlay.remove();
+    D.config.adminPassword=v;
+    saveConfig();
+    document.getElementById('newPass').value='';
+    toast('密碼已更新');
+    render();
+  };
+};
 window.addDept=()=>{const val=(UI._newDept||'').trim();if(!val)return;D.config.departments.push({name:val,users:[]});UI._newDept='';saveConfig();render();};
 window.delDept=i=>{D.config.departments.splice(i,1);saveConfig();render();};
 window.addUser=di=>{
@@ -562,7 +603,7 @@ window.clearAllData=()=>{
   // 顯示自訂確認框
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:flex;align-items:center;justify-content:center';
-  overlay.innerHTML='<div style="background:#fff;border-radius:12px;padding:24px;max-width:300px;width:90%;text-align:center"><div style="font-size:28px;margin-bottom:10px">⚠️</div><div style="font-size:15px;font-weight:500;margin-bottom:8px">確定清除所有資料？</div><div style="font-size:13px;color:#6b7280;margin-bottom:20px">部門、成員、週報、休假記錄將全部刪除，無法還原。</div><div style="display:flex;gap:8px;justify-content:center"><button id="cancelClear" style="padding:8px 20px;border:0.5px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:13px;background:#fff">取消</button><button id="confirmClear" style="padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-size:13px;background:#dc2626;color:#fff">確認清除</button></div></div>';
+  overlay.innerHTML='<div style="background:#fff;border-radius:12px;padding:24px;max-width:300px;width:90%;text-align:center"><div style="font-size:28px;margin-bottom:10px">⚠️</div><div style="font-size:15px;font-weight:500;margin-bottom:8px">確定清除所有資料？</div><div style="font-size:13px;color:#6b7280;margin-bottom:20px">組別、成員、週報、休假記錄將全部刪除，無法還原。</div><div style="display:flex;gap:8px;justify-content:center"><button id="cancelClear" style="padding:8px 20px;border:0.5px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:13px;background:#fff">取消</button><button id="confirmClear" style="padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-size:13px;background:#dc2626;color:#fff">確認清除</button></div></div>';
   document.body.appendChild(overlay);
   document.getElementById('cancelClear').onclick=()=>overlay.remove();
   document.getElementById('confirmClear').onclick=()=>{
