@@ -318,7 +318,7 @@ function build(){
   const[pStart,pEnd]=periodRange();
   const icons=['🥇','🥈','🥉'];
   const thisYear=new Date().getFullYear();
-  const years=[thisYear,thisYear-1,thisYear-2];
+  const years=[thisYear];
   const periods=[{key:'year',label:'全年'},{key:'q1',label:'Q1'},{key:'q2',label:'Q2'},{key:'q3',label:'Q3'},{key:'q4',label:'Q4'}];
   const badge=status==='open'
     ?`<span style="font-size:11px;color:#166534;background:#dcfce7;border:0.5px solid #86efac;padding:1px 8px;border-radius:20px;margin-left:8px">填寫中</span>`
@@ -419,7 +419,7 @@ ${UI.name?`
     </div>
     <div>${dept.users.map((u,ui)=>{const name=typeof u==='string'?u:u.name;const jd=typeof u==='string'?'':u.joinDate||'';return`<div class="member-row" draggable="true" data-di="${di}" data-ui="${ui}"><span class="drag-handle">⠿</span><span style="flex:1;font-size:13px;font-weight:500">${name}</span><span style="font-size:12px;color:#6b7280">${jd?`${jd} 起算`:'未設起算日'}</span><button onclick="delUser(${di},${ui})" style="border:none;background:none;cursor:pointer;color:#9ca3af;font-size:18px;line-height:1;padding:0 2px" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#9ca3af'">×</button></div>`;}).join('')}</div>
   </div>`).join('')}
-  ${D.config.departments.length===0?'<div style="font-size:13px;color:#6b7280">尚無部門，請新增</div>':''}
+  ${D.config.departments.length===0?'<div style="font-size:13px;color:#6b7280">尚無組別，請新增</div>':''}
 </div>
 <div class="card" style="border-color:#bfdbfe">
   <div class="card-title" style="color:#1d4ed8">歷史資料匯入（上傳 Excel）</div>
@@ -440,8 +440,8 @@ ${UI.name?`
   <div id="exportStatus" style="font-size:13px;margin-top:8px"></div>
 </div>
 <div class="card" style="border-color:#bfdbfe">
-  <div class="card-title" style="color:#1d4ed8">管理員密碼</div>
-  <div class="row"><input type="text" id="newPass" placeholder="輸入新密碼"><button class="btn btn-sm" style="color:#1d4ed8;border-color:#bfdbfe;white-space:nowrap" onclick="changePass()">更新密碼</button></div>
+  <div class="card-title" style="color:#1d4ed8">修改密碼</div>
+  <div class="row"><input type="text" id="newPass" placeholder="輸入新密碼"><button class="btn btn-sm" style="color:#1d4ed8;border-color:#bfdbfe;white-space:nowrap" onclick="changePass()">確認修改</button></div>
 </div>
 <div class="card" style="border-color:#fca5a5">
   <div class="card-title" style="color:#dc2626">危險操作</div>
