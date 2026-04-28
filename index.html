@@ -313,7 +313,13 @@ function build(){
   const prevWId=prevW(UI.currentWeek);
   const hasPrevData=ms.some(m=>D.reports[`${prevWId}_${m.name}`]);
   const wReports=Object.values(D.reports).filter(r=>r.weekId===UI.adminWeek);
-  const activeMembers=ms.filter(m=>isActive(m,UI.adminWeek));
+  // 有資料或有休假標記的人，不受起算日限制；起算日後的人也顯示
+  const activeMembers=ms.filter(m=>
+    isActive(m,UI.adminWeek) ||
+    !!D.reports[`${UI.adminWeek}_${m.name}`] ||
+    !!D.leaves[`${UI.adminWeek}_${m.name}`] ||
+    !!HISTORY_REPORTS[`${UI.adminWeek}_${m.name}`]
+  );
   const stats=ms.map(m=>({name:m.name,miss:calcMiss(m)})).filter(s=>s.miss!==null).sort((a,b)=>b.miss-a.miss);
   const[pStart,pEnd]=periodRange();
   const icons=['🥇','🥈','🥉'];
