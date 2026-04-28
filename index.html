@@ -380,7 +380,7 @@ ${UI.name?`
       const report=wReports.find(r=>r.userName===m.name);
       const onLeave=!!D.leaves[`${UI.adminWeek}_${m.name}`];
       if(report){
-        adminHtml+=`<div class="report-block"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-weight:500;color:#2563eb;font-size:14px">${m.name}</span>${UI.adminAuth?`<button class="leave-btn" onclick="toggleLeave('${UI.adminWeek}','${m.name}')">標記休假免交</button>`:''}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div style="font-size:11px;font-weight:500;color:#6b7280;margin-bottom:6px">本週工作</div>${(report.thisWeekItems||[]).map(i=>`<div style="font-size:13px;margin-bottom:3px;white-space:pre-wrap">• ${i}</div>`).join('')}</div><div><div style="font-size:11px;font-weight:500;color:#6b7280;margin-bottom:6px">下週預定</div>${(report.nextWeekItems||[]).map(i=>`<div style="font-size:13px;color:#6b7280;margin-bottom:3px;white-space:pre-wrap">• ${i}</div>`).join('')}</div></div></div>`;
+        adminHtml+=`<div class="report-block"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-weight:500;color:#2563eb;font-size:14px">${m.name}</span>${UI.adminAuth?(onLeave?`<button class="leave-btn cancel" onclick="toggleLeave('${UI.adminWeek}','${m.name}')">取消休假</button>`:`<button class="leave-btn" onclick="toggleLeave('${UI.adminWeek}','${m.name}')">標記休假免交</button>`):''}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div style="font-size:11px;font-weight:500;color:#6b7280;margin-bottom:6px">本週工作</div>${(report.thisWeekItems||[]).map(i=>`<div style="font-size:13px;margin-bottom:3px;white-space:pre-wrap">• ${i}</div>`).join('')}</div><div><div style="font-size:11px;font-weight:500;color:#6b7280;margin-bottom:6px">下週預定</div>${(report.nextWeekItems||[]).map(i=>`<div style="font-size:13px;color:#6b7280;margin-bottom:3px;white-space:pre-wrap">• ${i}</div>`).join('')}</div></div></div>`;
       }else if(onLeave){
         adminHtml+=`<div class="report-block on-leave"><div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-weight:500;font-size:14px;color:#6b7280">${m.name}</div><span class="leave-tag">休假免交</span></div>${UI.adminAuth?`<button class="leave-btn cancel" onclick="toggleLeave('${UI.adminWeek}','${m.name}')">取消休假</button>`:''}</div></div>`;
       }else{
@@ -536,7 +536,7 @@ ${UI.view==='myreport'?(function(){
       var dd=new Date(wid+'T00:00:00');dd.setDate(dd.getDate()-4);
       var monday=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
       var dateStr='<div style="font-size:13px;font-weight:500;color:#374151;margin-bottom:8px">'+monday+' ～ '+wid+'</div>';
-      if(isLeave){return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#2563eb;font-weight:500">當週休假免交</div></div>';}
+      if(!r&&isLeave){return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#2563eb;font-weight:500">當週休假免交</div></div>';}
       else if(!r){return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#dc2626;font-weight:500">當週未交週報</div></div>';}
       else{var thisW=(r.thisWeekItems||[]).map(function(i){return '<div style="font-size:14px;margin-bottom:5px;white-space:pre-wrap">• '+i+'</div>';}).join('');return '<div class="card" style="margin-bottom:12px">'+dateStr+thisW+'</div>';}
     }).join('');
@@ -587,7 +587,7 @@ if(UI.personName){
     var dd=new Date(wid+'T00:00:00');dd.setDate(dd.getDate()-4);
     var monday=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
     var dateStr='<div style="font-size:13px;font-weight:500;color:#374151;margin-bottom:8px">'+monday+' ～ '+wid+'</div>';
-    if(isLeave){
+    if(!r&&isLeave){
       return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#2563eb;font-weight:500">當週休假免交</div></div>';
     }else if(!r){
       return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#dc2626;font-weight:500">當週未交週報</div></div>';
