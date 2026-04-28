@@ -228,7 +228,7 @@ function loadPersonReport(name,weekId){
 }
 function init(){
   // 先從 localStorage 快速載入顯示
-  const c=load('wr_config');if(c){D.config.departments=c.departments||[];D.config.adminPassword=c.adminPassword||'0000';}
+  const c=load('wr_config');if(c){D.config.departments=c.departments||[];D.config.adminPassword=c.adminPassword||'0000';D.config.memberPasswords=c.memberPasswords||{};}
   const r=load('wr_reports');if(r)Object.assign(D.reports,r);
   const l=load('wr_leaves');if(l)Object.assign(D.leaves,l);
   render();
@@ -246,7 +246,7 @@ async function loadFromFirebase(){
       if(snap.exists){
         const v=JSON.parse(snap.data().data);
         localStorage.setItem(k,JSON.stringify(v));
-        if(k==='wr_config'){D.config.departments=v.departments||[];D.config.adminPassword=v.adminPassword||'0000';}
+        if(k==='wr_config'){D.config.departments=v.departments||[];D.config.adminPassword=v.adminPassword||'0000';D.config.memberPasswords=v.memberPasswords||{};}
         if(k==='wr_reports')Object.assign(D.reports,v);
         if(k==='wr_leaves')Object.assign(D.leaves,v);
       }
