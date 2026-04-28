@@ -518,6 +518,17 @@ ${UI.view==='myreport'?(function(){
     var allR=Object.assign({},HISTORY_REPORTS,D.reports);
     var allWeekIds=[...new Set(Object.values(allR).map(function(r){return r.weekId;}).filter(Boolean))];
     Object.keys(D.leaves).forEach(function(k){var w=k.split('_')[0];if(w)allWeekIds.push(w);});
+    // 從起算日到今天補齊所有週次
+    var myMeta2=D.config.departments.flatMap(function(d){return (d.users||[]).map(function(u){return {name:typeof u==='string'?u:u.name,joinDate:typeof u==='string'?'':u.joinDate||''};});}).find(function(u){return u.name===UI.myName;});
+    var myStart2=myMeta2&&myMeta2.joinDate?myMeta2.joinDate:'2026-01-02';
+    var mySd2=new Date(myStart2+'T00:00:00');
+    while(mySd2.getDay()!==5){mySd2.setDate(mySd2.getDate()+1);}
+    var myToday2=new Date();myToday2.setHours(0,0,0,0);
+    var myCur2=new Date(mySd2);
+    while(myCur2<=myToday2){
+      allWeekIds.push(myCur2.getFullYear()+'-'+String(myCur2.getMonth()+1).padStart(2,'0')+'-'+String(myCur2.getDate()).padStart(2,'0'));
+      myCur2.setDate(myCur2.getDate()+7);
+    }
     allWeekIds=[...new Set(allWeekIds)].sort().reverse();
     var content=allWeekIds.length===0?'<div style="font-size:13px;color:#6b7280;text-align:center;padding:40px 0">尚無週報資料</div>':allWeekIds.map(function(wid){
       var r=allR[wid+'_'+UI.myName];
@@ -549,12 +560,17 @@ if(UI.personName){
   // 找這個人的起算日期
   var personMeta=D.config.departments.flatMap(function(d){return (d.users||[]).map(function(u){return {name:typeof u==='string'?u:u.name,joinDate:typeof u==='string'?'':u.joinDate||''};});}).find(function(u){return u.name===UI.personName;});
   // 從起算日（或最早有資料的日期）算出所有週五到今天
+  // 從所有資料（含歷史）+ leaves 收集週次，不受起算日限制
+  var allR2=Object.assign({},HISTORY_REPORTS,D.reports);
+  var allWids=[...new Set(
+    Object.values(allR2).map(function(r){return r.weekId;}).filter(Boolean)
+    .concat(Object.keys(D.leaves).map(function(k){return k.split('_')[0];}))
+  )];
+  // 再從起算日到今天補上中間可能沒資料的週次
   var startDate=personMeta&&personMeta.joinDate?personMeta.joinDate:'2026-01-02';
-  // 找 startDate 當週或之後第一個週五
   var sd=new Date(startDate+'T00:00:00');
   while(sd.getDay()!==5){sd.setDate(sd.getDate()+1);}
   var today=new Date();today.setHours(0,0,0,0);
-  var allWids=[];
   var cur=new Date(sd);
   while(cur<=today){
     var y=cur.getFullYear();
@@ -563,7 +579,7 @@ if(UI.personName){
     allWids.push(y+'-'+mo+'-'+dy);
     cur.setDate(cur.getDate()+7);
   }
-  allWids.reverse();
+  allWids=[...new Set(allWids)].sort().reverse();
   if(allWids.length===0){content='<div style="font-size:13px;color:#6b7280;text-align:center;padding:40px 0">尚無週報資料</div>';}
   else{content=allWids.map(function(wid){
     var r=allR[wid+'_'+UI.personName];
