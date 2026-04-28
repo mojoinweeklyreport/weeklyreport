@@ -111,7 +111,7 @@ const D={leaves:{},reports:{},config:{departments:[],adminPassword:'0000'}};
 const UI={
   view:'report',adminWeek:getFriday(new Date()),currentWeek:getFriday(new Date()),
   dept:'',name:'',thisItems:['','','','',''],thisPre:Array(5).fill(false),
-  nextItems:['','',''],editing:false,adminAuth:false,personName:'',
+  nextItems:['','',''],editing:false,adminAuth:false,personName:'',myDept:'',myName:'',myAuth:false,sessionAuthed:'',
   period:'year',year:new Date().getFullYear(),toast:null,drag:null,
   _newDept:'',_newU:{},_newUDate:{}
 };
@@ -349,6 +349,7 @@ function build(){
       <select style="width:auto" onchange="UI.name=this.value;if(this.value)loadPersonReport(this.value,UI.currentWeek);render()">
         <option value="">選擇姓名</option>${deptUsers.map(u=>`<option value="${u}"${UI.name===u?' selected':''}>${u}</option>`).join('')}
       </select>
+      ${UI.name?`<button onclick="window.showMyReportFromReport()" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:0.5px solid #d1d5db;border-radius:8px;background:#fff;font-size:13px;color:#374151;cursor:pointer;white-space:nowrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>查看我的歷史週報</button>`:''}
     </div>
   </div>
 </div>
@@ -454,6 +455,7 @@ ${UI.name?`
 ${UI.toast?`<div class="toast ${UI.toast.type}">${UI.toast.msg}</div>`:''}
 <div class="nav">
   <button class="${UI.view==='report'?'active':''}" onclick="UI.view='report';render()" style="display:flex;align-items:center;justify-content:center;gap:5px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>填寫週報</button>
+  <button class="${UI.view==='myreport'?'active':''}" onclick="UI.view='myreport';render()" style="display:flex;align-items:center;justify-content:center;gap:5px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>我的週報</button>
   <button class="${UI.view==='stats'?'active':''}" onclick="UI.view='stats';render()" style="display:flex;align-items:center;justify-content:center;gap:5px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M6 9H4a2 2 0 0 1-2-2V5h4"/><path d="M18 9h2a2 2 0 0 0 2-2V5h-4"/><path d="M12 17v4"/><path d="M8 21h8"/><path d="M6 9a6 6 0 0 0 12 0V3H6v6z"/></svg>缺交排行榜</button>
   ${UI.adminAuth?'<button class="'+(UI.view==='admin'?'active':'')+'" onclick="UI.view=\'admin\';render()" style="display:flex;align-items:center;justify-content:center;gap:5px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>每週彙整</button><button class="'+(UI.view==='person'?'active':'')+'" onclick="UI.view=\'person\';render()" style="display:flex;align-items:center;justify-content:center;gap:5px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0 1 13 0"/></svg>個人彙整</button>':''}
   <button class="${UI.view==='settings'?'active':''}" onclick="UI.view='settings';render()" style="display:flex;align-items:center;justify-content:center;gap:5px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>管理員設定</button>
@@ -506,6 +508,38 @@ ${UI.view==='stats'?`
     }).join('');
   })()}
 </div>`:''}
+${UI.view==='myreport'?(function(){
+  var deptUsers=UI.myDept?((D.config.departments.find(function(d){return d.name===UI.myDept;})||{}).users||[]).map(function(u){return typeof u==='string'?u:u.name;}):[];
+  var deptOpts=D.config.departments.map(function(d){return '<option value="'+d.name+'"'+(UI.myDept===d.name?' selected':'')+'>'+d.name+'</option>';}).join('');
+  var nameOpts=deptUsers.map(function(u){return '<option value="'+u+'"'+(UI.myName===u?' selected':'')+'>'+u+'</option>';}).join('');
+
+  if(UI.myAuth){
+    // 已驗證，顯示個人週報
+    var allR=Object.assign({},HISTORY_REPORTS,D.reports);
+    var allWeekIds=[...new Set(Object.values(allR).map(function(r){return r.weekId;}).filter(Boolean))];
+    Object.keys(D.leaves).forEach(function(k){var w=k.split('_')[0];if(w)allWeekIds.push(w);});
+    allWeekIds=[...new Set(allWeekIds)].sort().reverse();
+    var content=allWeekIds.length===0?'<div style="font-size:13px;color:#6b7280;text-align:center;padding:40px 0">尚無週報資料</div>':allWeekIds.map(function(wid){
+      var r=allR[wid+'_'+UI.myName];
+      var isLeave=!!D.leaves[wid+'_'+UI.myName];
+      var dd=new Date(wid+'T00:00:00');dd.setDate(dd.getDate()-4);
+      var monday=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+      var dateStr='<div style="font-size:13px;font-weight:500;color:#374151;margin-bottom:8px">'+monday+' ～ '+wid+'</div>';
+      if(isLeave){return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#2563eb;font-weight:500">當週休假免交</div></div>';}
+      else if(!r){return '<div class="card" style="margin-bottom:12px">'+dateStr+'<div style="font-size:14px;color:#dc2626;font-weight:500">當週未交週報</div></div>';}
+      else{var thisW=(r.thisWeekItems||[]).map(function(i){return '<div style="font-size:14px;margin-bottom:5px;white-space:pre-wrap">• '+i+'</div>';}).join('');return '<div class="card" style="margin-bottom:12px">'+dateStr+thisW+'</div>';}
+    }).join('');
+    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:#111827">'+UI.myName+'</div><button onclick="UI.myAuth=false;UI.myName=\'\';UI.myDept=\'\';UI.sessionAuthed=\'\';render()" style="font-size:12px;color:#6b7280;background:none;border:0.5px solid #d1d5db;border-radius:6px;padding:2px 10px;cursor:pointer">登出</button></div>'+content;
+  }
+
+  // 未驗證，顯示選組別/姓名
+  return '<div class="card"><div style="font-size:14px;font-weight:500;color:#111827;margin-bottom:14px">查詢個人週報</div>'
+    +'<div style="font-size:13px;color:#6b7280;margin-bottom:6px">選擇組別</div>'
+    +'<select onchange="UI.myDept=this.value;UI.myName=\'\';render()" style="width:100%;padding:8px 12px;border:0.5px solid #e5e7eb;border-radius:8px;font-size:14px;margin-bottom:12px"><option value="">-- 請選擇 --</option>'+deptOpts+'</select>'
+    +(UI.myDept?'<div style="font-size:13px;color:#6b7280;margin-bottom:6px">選擇姓名</div><select onchange="UI.myName=this.value;render()" style="width:100%;padding:8px 12px;border:0.5px solid #e5e7eb;border-radius:8px;font-size:14px;margin-bottom:14px"><option value="">-- 請選擇 --</option>'+nameOpts+'</select>':'')
+    +(UI.myName?'<button onclick="window.showMyReportAuth()" style="width:100%;padding:10px;background:#111827;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer">驗證身份</button>':'')
+    +'</div>';
+})():''}
 ${UI.view==='person'?(UI.adminAuth?(function(){
 var allR=Object.assign({},HISTORY_REPORTS,D.reports);
 var members=D.config.departments.flatMap(function(d){return (d.users||[]).map(function(m){return {name:m.name,dept:d.name};});});
@@ -741,6 +775,76 @@ window.doXlsxImport=function(){
   reader.readAsArrayBuffer(file);
 };
 
+window.showMyReportFromReport=function(){
+  UI.myDept=UI.dept;
+  UI.myName=UI.name;
+  // 已驗證過此人，直接跳過
+  if(UI.sessionAuthed===UI.myName){
+    UI.myAuth=true;
+    UI.view='myreport';
+    render();
+    return;
+  }
+  window.showMyReportAuth();
+};
+
+window.showMyReportAuth=function(){
+  // 已驗證過此人（切頁面後回來），直接通過
+  if(UI.sessionAuthed===UI.myName){
+    UI.myAuth=true;
+    render();
+    return;
+  }
+  var memberPwds=D.config.memberPasswords||{};
+  var hasPass=!!memberPwds[UI.myName];
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:flex;align-items:center;justify-content:center';
+  var title=hasPass?'輸入密碼':'設定個人密碼';
+  var subtitle=hasPass?'請輸入你的個人密碼':'第一次登入，請設定你的個人密碼';
+  overlay.innerHTML='<div style="background:#fff;border-radius:14px;padding:28px 24px;max-width:320px;width:90%;text-align:center">'
+    +'<div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:6px">'+title+'</div>'
+    +'<div style="font-size:13px;color:#6b7280;margin-bottom:16px">'+subtitle+'</div>'
+    +'<input id="myPwdInput" type="text" placeholder="輸入密碼" style="width:100%;padding:10px 12px;border:0.5px solid #d1d5db;border-radius:8px;font-size:15px;margin-bottom:12px;box-sizing:border-box;text-align:center;letter-spacing:2px">'
+    +'<div id="myPwdErr" style="font-size:13px;color:#dc2626;margin-bottom:10px;min-height:18px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button id="cancelMyPwd" style="flex:1;padding:10px;border:0.5px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:14px;background:#fff">取消</button>'
+    +'<button id="confirmMyPwd" style="flex:1;padding:10px;border:none;border-radius:8px;cursor:pointer;font-size:14px;background:#111827;color:#fff">確認</button>'
+    +'</div></div>';
+  document.body.appendChild(overlay);
+  document.getElementById('myPwdInput').focus();
+  document.getElementById('cancelMyPwd').onclick=function(){overlay.remove();};
+  document.getElementById('confirmMyPwd').onclick=function(){
+    var v=document.getElementById('myPwdInput').value.trim();
+    if(!v){document.getElementById('myPwdErr').textContent='請輸入密碼';return;}
+    if(!hasPass){
+      // 第一次設定
+      if(!D.config.memberPasswords)D.config.memberPasswords={};
+      D.config.memberPasswords[UI.myName]=v;
+      saveConfig();
+      overlay.remove();
+      UI.myAuth=true;
+      UI.sessionAuthed=UI.myName;
+      UI.view='myreport';
+      render();
+    } else {
+      // 驗證密碼
+      if(v===memberPwds[UI.myName]){
+        overlay.remove();
+        UI.myAuth=true;
+        UI.sessionAuthed=UI.myName;
+        UI.view='myreport';
+        render();
+      } else {
+        document.getElementById('myPwdErr').textContent='密碼錯誤，請再試一次';
+        document.getElementById('myPwdInput').value='';
+        document.getElementById('myPwdInput').focus();
+      }
+    }
+  };
+  // Enter 鍵觸發
+  document.getElementById('myPwdInput').onkeydown=function(e){if(e.key==='Enter')document.getElementById('confirmMyPwd').click();};
+};
+
 window.doXlsxExport=function(){
   const status=document.getElementById('exportStatus');
   status.style.color='#6b7280';status.textContent='產生中...';
@@ -830,6 +934,76 @@ window.doXlsxExport=function(){
   }
   setInterval(checkDeadline,60000);
 })();
+
+window.showMyReportFromReport=function(){
+  UI.myDept=UI.dept;
+  UI.myName=UI.name;
+  // 已驗證過此人，直接跳過
+  if(UI.sessionAuthed===UI.myName){
+    UI.myAuth=true;
+    UI.view='myreport';
+    render();
+    return;
+  }
+  window.showMyReportAuth();
+};
+
+window.showMyReportAuth=function(){
+  // 已驗證過此人（切頁面後回來），直接通過
+  if(UI.sessionAuthed===UI.myName){
+    UI.myAuth=true;
+    render();
+    return;
+  }
+  var memberPwds=D.config.memberPasswords||{};
+  var hasPass=!!memberPwds[UI.myName];
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:flex;align-items:center;justify-content:center';
+  var title=hasPass?'輸入密碼':'設定個人密碼';
+  var subtitle=hasPass?'請輸入你的個人密碼':'第一次登入，請設定你的個人密碼';
+  overlay.innerHTML='<div style="background:#fff;border-radius:14px;padding:28px 24px;max-width:320px;width:90%;text-align:center">'
+    +'<div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:6px">'+title+'</div>'
+    +'<div style="font-size:13px;color:#6b7280;margin-bottom:16px">'+subtitle+'</div>'
+    +'<input id="myPwdInput" type="text" placeholder="輸入密碼" style="width:100%;padding:10px 12px;border:0.5px solid #d1d5db;border-radius:8px;font-size:15px;margin-bottom:12px;box-sizing:border-box;text-align:center;letter-spacing:2px">'
+    +'<div id="myPwdErr" style="font-size:13px;color:#dc2626;margin-bottom:10px;min-height:18px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button id="cancelMyPwd" style="flex:1;padding:10px;border:0.5px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:14px;background:#fff">取消</button>'
+    +'<button id="confirmMyPwd" style="flex:1;padding:10px;border:none;border-radius:8px;cursor:pointer;font-size:14px;background:#111827;color:#fff">確認</button>'
+    +'</div></div>';
+  document.body.appendChild(overlay);
+  document.getElementById('myPwdInput').focus();
+  document.getElementById('cancelMyPwd').onclick=function(){overlay.remove();};
+  document.getElementById('confirmMyPwd').onclick=function(){
+    var v=document.getElementById('myPwdInput').value.trim();
+    if(!v){document.getElementById('myPwdErr').textContent='請輸入密碼';return;}
+    if(!hasPass){
+      // 第一次設定
+      if(!D.config.memberPasswords)D.config.memberPasswords={};
+      D.config.memberPasswords[UI.myName]=v;
+      saveConfig();
+      overlay.remove();
+      UI.myAuth=true;
+      UI.sessionAuthed=UI.myName;
+      UI.view='myreport';
+      render();
+    } else {
+      // 驗證密碼
+      if(v===memberPwds[UI.myName]){
+        overlay.remove();
+        UI.myAuth=true;
+        UI.sessionAuthed=UI.myName;
+        UI.view='myreport';
+        render();
+      } else {
+        document.getElementById('myPwdErr').textContent='密碼錯誤，請再試一次';
+        document.getElementById('myPwdInput').value='';
+        document.getElementById('myPwdInput').focus();
+      }
+    }
+  };
+  // Enter 鍵觸發
+  document.getElementById('myPwdInput').onkeydown=function(e){if(e.key==='Enter')document.getElementById('confirmMyPwd').click();};
+};
 
 window.doXlsxExport=function(){
   const status=document.getElementById('exportStatus');
